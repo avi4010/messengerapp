@@ -1,0 +1,30 @@
+version: '3'
+services:
+  messengerMySQLDB:
+    image: mysql:5.7
+    container_name: mysql_avi
+    volumes:
+      - messegerdbdata:/var/lib/mysql
+      - ./init/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+  messengerapp:
+    build: .
+    depends_on:
+      - messengerMySQLDB
+    container_name: messenger_app
+    ports:
+      - "8079:8080"
+    links:
+      - "messengerMySQLDB:mysql_avi"
+  messengerPhpMyAdmim:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - messengerMySQLDB
+    container_name: messenger_db_visualizer
+    ports:
+      - "8078:80"
+    links:
+      - "messengerMySQLDB:db"
+volumes:
+    messegerdbdata:
